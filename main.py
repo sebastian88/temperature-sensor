@@ -59,7 +59,7 @@ else:
         request = requests.post(url,json=sensor_readings,headers=request_headers)
         request.close()
         
-        time.sleep(60)
+        time.sleep(300)
 
 
 
