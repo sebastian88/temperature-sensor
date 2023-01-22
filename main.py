@@ -1,19 +1,15 @@
 from machine import Pin
-from machine import ADC
-from dht import DHT11, InvalidChecksum
+from dht import DHT11
 import time, ntptime
 import network
 import urequests as requests
+import wifi_secrets
 
-
-ssid = '...'
-password = '...'
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.connect(ssid, password)
+wlan.connect(wifi_secrets.ssid, wifi_secrets.password)
 
-adc = machine.ADC(4) 
 time.sleep(1)
 
 pin = Pin(28, Pin.OUT, Pin.PULL_DOWN)
