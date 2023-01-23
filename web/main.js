@@ -65,27 +65,30 @@ async function drawGraph() {
     rooms.push(new Room(roomName, date(), data, getRandomColour()))
   }
 
-
+  datasets = []
   for(let room of rooms) {
-    new Chart("myChart", {
+    datasets.push({
+      label: room.name + ' temperature',
+      borderColor: room.colour,
+      fill: false,
+      data: room.getTemperatures,
+      yAxisID: 'y1'
+    })
+
+    datasets.push({
+      label: room.name + ' humidity',
+      borderColor: room.colour,
+      fill: false,
+      data: room.getHumidities,
+      borderDash: [10,5],
+      yAxisID: 'y2'
+    })
+  }
+
+  new Chart("myChart", {
     type: "line",
     data: {
-      datasets: [{
-        label: room.name + ' temperature',
-        borderColor: room.colour,
-        fill: false,
-        data: room.getTemperatures,
-        yAxisID: 'y1'
-      },
-      {
-        label: room.name + ' humidity',
-        borderColor: room.colour,
-        fill: false,
-        data: room.getHumidities,
-        borderDash: [10,5],
-        yAxisID: 'y2'
-      },
-    ]
+      datasets: datasets
     },
     options: {
       scales: {
@@ -102,7 +105,6 @@ async function drawGraph() {
       }
     }
   });
-  }
 }
 drawGraph()
 
