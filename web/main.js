@@ -1,11 +1,61 @@
 
-colours = ['blue','green', 'black', 'pink', 'purple', 'brown', 'orange', 'grey', 'red', 'yellow']
+let colours = ['blue', 'green', 'black', 'pink', 'purple', 'brown', 'orange', 'grey', 'red']
+const params = new URLSearchParams(window.location.search);
 
-class Room {  
-  constructor(name, date, data, colour) {
-    this.name = name;
-    this.date = date;
-    this.data = data;
+function pad(i){
+  if(i < 10)
+    return "0" + i
+  return "" + i
+}
+
+function getUrl() {
+  let currentUrl = window.location.href
+  return new URL(currentUrl)
+}
+
+function addDays(date, days) {
+  var result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+function today() {
+  let url = getUrl()
+  if(!url.searchParams.get('s'))
+    url.searchParams.set('s', 'th')
+
+  let today = new Date()
+  let dateString = today.getFullYear() + '-' + pad(today.getMonth()+1) + '-' + pad(today.getDate())
+  url.searchParams.set('d', dateString)
+  window.location.href = url
+}
+
+// ?d=2023-01-22&s=th&1=1&2=2&3=3&4=4&5=5&6=6&7=7&8=8
+function back() {
+  move(-1)
+}
+
+function forward() {
+  move(1)
+}
+
+function move(i) {
+  let currentUrl = window.location.href
+  let url = new URL(currentUrl)
+  let d = url.searchParams.get('d')
+
+  let dateMinusOne = addDays(d, i)
+  let dateString = dateMinusOne.getFullYear() + '-' + pad(dateMinusOne.getMonth()+1) + '-' + pad(dateMinusOne.getDate())
+  url.searchParams.set('d', dateString)
+  window.location.href = url
+}
+
+class Room {
+  constructor(id, name, date, data, colour) {
+    this.id = id
+    this.name = name
+    this.date = date
+    this.data = data
     this.colour = colour
     this.temperatures = []
     this.humidities = []
@@ -13,20 +63,18 @@ class Room {
   }
 
   get getTemperatures() {
-    for(let item of this.data){
-      this.temperatures.push({x:Date.parse(item.t),y:item.c})
+    for (let item of this.data) {
+      this.temperatures.push({ x: Date.parse(item.t), y: item.c })
     }
     return this.temperatures
   }
 
   get getHumidities() {
-    for(let item of this.data){
-      this.humidities.push({x:Date.parse(item.t),y:item.h})
+    for (let item of this.data) {
+      this.humidities.push({ x: Date.parse(item.t), y: item.h })
     }
     return this.humidities
   }
-
-
 }
 
 async function get(roomName, date) {
@@ -39,49 +87,84 @@ async function get(roomName, date) {
   return response.json()
 }
 
-function roomNames(){
-  return [
-    'external'
-  ]
+function roomNames() {
+  let rooms = []
+
+  for (let i = 1; i <= 8; i++) {
+    if (params.get(i)) {
+      id = i
+      if (i === 1) id = 'external'
+      rooms.push({
+        'id': id,
+        'name': params.get(i)
+      })
+    }
+  }
+  return rooms
 }
 
 function date() {
-  return '2023-01-23'
+  return params.get('d')
 }
 
-function getRandomColour() {
-  const index = Math.floor(Math.random()*colours.length)
-  ret = colours[index]
-  colours.splice(index, 1);
-  return ret
+function showTemp() {
+  return params.get('s').includes('t')
 }
 
+function showHumidity() {
+  return params.get('s').includes('h')
+}
 
+function getColour() {
+  return colours.shift();
+}
 
 async function drawGraph() {
-  rooms = []
-  for(let roomName of roomNames()) {
-    const data = await get(roomName, date())
-    rooms.push(new Room(roomName, date(), data, getRandomColour()))
+  if(!getUrl().searchParams.get('s')) return
+  let rooms = []
+  for (let roomName of roomNames()) {
+    const data = await get(roomName.id, date())
+    rooms.push(new Room(roomName.id, roomName.name, date(), data, getColour()))
   }
 
-  datasets = []
-  for(let room of rooms) {
-    datasets.push({
-      label: room.name + ' temperature',
-      borderColor: room.colour,
-      fill: false,
-      data: room.getTemperatures,
-      yAxisID: 'y1'
-    })
+  let datasets = []
+  let isShowTemp = showTemp()
+  let isShowHumidity = showHumidity()
+  for (let room of rooms) {
+    if (isShowTemp) {
+      datasets.push({
+        label: room.name + ' temperature',
+        pointRadius: 0,
+        borderColor: room.colour,
+        fill: false,
+        data: room.getTemperatures,
+        yAxisID: 'y1'
+      })
+    }
 
-    datasets.push({
-      label: room.name + ' humidity',
-      borderColor: room.colour,
-      fill: false,
-      data: room.getHumidities,
-      borderDash: [10,5],
-      yAxisID: 'y2'
+    if (isShowHumidity) {
+      datasets.push({
+        label: room.name + ' humidity',
+        pointRadius: 0,
+        borderColor: room.colour,
+        fill: false,
+        data: room.getHumidities,
+        borderDash: [5, 5],
+        yAxisID: 'y2'
+      })
+    }
+  }
+  let yAxes = []
+  if(isShowTemp) {
+    yAxes.push({
+      id: 'y1',
+      position: 'left',
+    })
+  }
+  if(isShowHumidity) {
+    yAxes.push({
+      id: 'y2',
+      position: 'right'
     })
   }
 
@@ -91,17 +174,12 @@ async function drawGraph() {
       datasets: datasets
     },
     options: {
+      animation: false,
       scales: {
         xAxes: [{
           type: 'time',
         }],
-        yAxes: [{
-          id: 'y1',
-          position: 'left',
-        }, {
-          id: 'y2',
-          position: 'right'
-        }]
+        yAxes: yAxes
       }
     }
   });
