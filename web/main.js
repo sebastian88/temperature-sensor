@@ -90,10 +90,9 @@ async function get(roomName, date) {
 function roomNames() {
   let rooms = []
 
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= 9; i++) {
     if (params.get(i)) {
       id = i
-      if (i === 1) id = 'external'
       rooms.push({
         'id': id,
         'name': params.get(i)
