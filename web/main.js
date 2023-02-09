@@ -19,18 +19,21 @@ function addDays(date, days) {
   return result;
 }
 
+function getTodaysDate() {
+  let today = new Date()
+  return today.getFullYear() + '-' + pad(today.getMonth()+1) + '-' + pad(today.getDate())
+}
+
 function today() {
   let url = getUrl()
   if(!url.searchParams.get('s'))
     url.searchParams.set('s', 'th')
 
-  let today = new Date()
-  let dateString = today.getFullYear() + '-' + pad(today.getMonth()+1) + '-' + pad(today.getDate())
+  let dateString = getTodaysDate()
   url.searchParams.set('d', dateString)
   window.location.href = url
 }
 
-// ?d=2023-01-22&s=th&1=1&2=2&3=3&4=4&5=5&6=6&7=7&8=8
 function back() {
   move(-1)
 }
@@ -42,7 +45,7 @@ function forward() {
 function move(i) {
   let currentUrl = window.location.href
   let url = new URL(currentUrl)
-  let d = url.searchParams.get('d')
+  let d = date()
 
   let dateMinusOne = addDays(d, i)
   let dateString = dateMinusOne.getFullYear() + '-' + pad(dateMinusOne.getMonth()+1) + '-' + pad(dateMinusOne.getDate())
@@ -103,7 +106,10 @@ function roomNames() {
 }
 
 function date() {
-  return params.get('d')
+  let date = params.get('d')
+  if(date === 'today')
+    date = getTodaysDate()
+  return date
 }
 
 function showTemp() {
