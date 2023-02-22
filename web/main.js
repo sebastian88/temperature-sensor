@@ -112,6 +112,10 @@ function date() {
   return date
 }
 
+function getRollingAverage() {
+  return parseInt(params.get('r') ?? 0)
+}
+
 function showTemp() {
   return params.get('s').includes('t')
 }
@@ -122,6 +126,40 @@ function showHumidity() {
 
 function getColour() {
   return colours.shift();
+}
+
+function movingAvg(array){
+  const rollingAverage = getRollingAverage()
+  if(rollingAverage <= 1){
+    return array
+  }
+
+  var avg = function(array){
+
+      var sum = 0, count = 0, val;
+      for (var i in array){
+          val = parseFloat(array[i].y);
+          sum += val;
+          count++;
+      }
+
+      return sum / count;
+  };
+
+  var result = [], val;
+
+  for (var i=0, len=array.length - rollingAverage; i <= len; i++){
+
+      val = avg(array.slice(i, i + rollingAverage));
+      if (isNaN(val))
+          console.log('nan')
+      else{
+        array[i].y = val
+        result.push(array[i]);
+      }
+  }
+
+  return result;
 }
 
 async function drawGraph() {
@@ -142,7 +180,8 @@ async function drawGraph() {
         pointRadius: 0,
         borderColor: room.colour,
         fill: false,
-        data: room.getTemperatures,
+        // lineTension: 1,
+        data: movingAvg(room.getTemperatures),
         yAxisID: 'y1'
       })
     }
