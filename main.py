@@ -38,24 +38,27 @@ else:
     request_headers = {'Content-Type': 'application/json'}
     url='https://3mya4jha58.execute-api.eu-west-1.amazonaws.com/live'
     while True:
-        current_time = date(time.localtime())
-        
-        temperature_got = False
-        temperature = None
-        humidity = None
-        while temperature_got is False:
-            try:
-                temperature = sensor.temperature
-                humidity = sensor.humidity
-                temperature_got = True
-            except Exception as e:
-                print(e)
-        
-        sensor_readings={'room': 'external','time': current_time, 'temperature': temperature, 'humidity': humidity}`
-        request = requests.post(url,json=sensor_readings,headers=request_headers)
-        request.close()
-        
-        time.sleep(300)
+        try:
+            current_time = date(time.localtime())
+            
+            temperature_got = False
+            temperature = None
+            humidity = None
+            while temperature_got is False:
+                try:
+                    temperature = sensor.temperature
+                    humidity = sensor.humidity
+                    temperature_got = True
+                except Exception as e:
+                    print(e)
+            
+            sensor_readings={'room': 'external','time': current_time, 'temperature': temperature, 'humidity': humidity}`
+            request = requests.post(url,json=sensor_readings,headers=request_headers)
+            request.close()
+            
+            time.sleep(300)
+        except Exception as e:
+            print(e)
 
 
 
