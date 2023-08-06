@@ -6,45 +6,42 @@ import network
 import urequests as requests
 import wifi_secrets
 
+try:
 
-ssid = 'Freb_crap'
-password = 'Pineapple1'
-room = '4'
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(wifi_secrets.ssid, wifi_secrets.password)
 
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wlan.connect(wifi_secrets.ssid, wifi_secrets.password)
-
-time.sleep(1)
-
-pin = Pin(28, Pin.OUT, Pin.PULL_DOWN)
-sensor = DHT11(pin)
-led = machine.Pin("LED", machine.Pin.OUT)
-
-def date(st):
-    return"{:4}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}Z".format( \
-        st[0], st[1], st[2], st[3], st[4], st[5])
-
-def flash(times):
-    while times > 0:
-        led.on()
-        time.sleep(0.1)
-        led.off()
-        time.sleep(0.1)
-        times = times - 1
-
-# Wait for connect or fail
-max_wait = 10
-while max_wait > 0:
-    if wlan.status() < 0 or wlan.status() >= 3:
-        break
-    max_wait -= 1
-    print('waiting for connection...')
     time.sleep(1)
-# Handle connection error
-if wlan.status() != 3:
-    raise RuntimeError('network connection failed')
-else:
+
+    pin = Pin(28, Pin.OUT, Pin.PULL_DOWN)
+    sensor = DHT11(pin)
+    led = machine.Pin("LED", machine.Pin.OUT)
+
+    def date(st):
+        return"{:4}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}Z".format( \
+            st[0], st[1], st[2], st[3], st[4], st[5])
+
+    def flash(times):
+        while times > 0:
+            led.on()
+            time.sleep(0.2)
+            led.off()
+            time.sleep(0.2)
+            times = times - 1
+
+    # Wait for connect or fail
+    max_wait = 10
+    while max_wait > 0:
+        if wlan.status() < 0 or wlan.status() >= 3:
+            break
+        max_wait -= 1
+        print('waiting for connection...')
+        time.sleep(1)
+    # Handle connection error
+    if wlan.status() != 3:
+        raise RuntimeError('network connection failed')
+
     print('connected')
     status = wlan.ifconfig()
     print( 'ip = ' + status[0] )
@@ -66,26 +63,31 @@ else:
     
 
     while True:
-        try:
-            current_time = date(time.localtime())
+        current_time = date(time.localtime())
+        
+        temperature_got = False
+        temperature = None
+        humidity = None
+        while temperature_got is False:
+            try:
+                temperature = sensor.temperature
+                humidity = sensor.humidity
+                temperature_got = True
+            except Exception as e:
+                print(e)
+        
+        sensor_readings={'room': wifi_secrets.room,'time': current_time, 'temperature': temperature, 'humidity': humidity}
+        request = requests.post(wifi_secrets.url,json=sensor_readings,headers=request_headers)
+        request.close()
+
+    time.sleep(60)
             
-            temperature_got = False
-            temperature = None
-            humidity = None
-            while temperature_got is False:
-                try:
-                    temperature = sensor.temperature
-                    humidity = sensor.humidity
-                    temperature_got = True
-                except Exception as e:
-                    print(e)
-            
-            sensor_readings={'room': wifi_secrets.room,'time': current_time, 'temperature': temperature, 'humidity': humidity}
-            request = requests.post(wifi_secrets.url,json=sensor_readings,headers=request_headers)
-            request.close()
-        except Exception as e:
-            print(e)
-        time.sleep(300)
+except Exception as e:
+    print(e)
+
+
+
+
 
 
 
