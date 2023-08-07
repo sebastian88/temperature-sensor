@@ -79,11 +79,12 @@ try:
         sensor_readings={'room': wifi_secrets.room,'time': current_time, 'temperature': temperature, 'humidity': humidity}
         request = requests.post(wifi_secrets.url,json=sensor_readings,headers=request_headers)
         request.close()
-
-    time.sleep(60)
+        time.sleep(300)
             
 except Exception as e:
     print(e)
+    
+time.sleep(60)
 
 
 
