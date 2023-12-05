@@ -1,16 +1,35 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
     </head>
     <body>
-        <button title="<<" id="back" onclick="back()"><<</button>
-        <button title="today" id="today" onclick="today()"">today</button>
-        <button title=">>" id="forward" onclick="forward()">>></button>
-        <canvas id="myChart" style="width:100%"></canvas>
-        
-        <script src="main.js"></script>
+        <h1><a href="graph.html?s=t&d=today&r=15&3=Office&4=Box+room&5=Bedroom&6=Living+room&8=Kitchen&9=Outside&2=Bathroom&7=Hallway&Test=1">
+            graph.html?s=t&d=today&r=15&3=Office&4=Box+room&5=Bedroom&6=Living+room&8=Kitchen&9=Outside&2=Bathroom&7=Hallway&Test=1
+        </a></h1>
+        <div id="rawjson">
+
+        </div>
+        <script type="text/javascript">
+            function pad(i){
+                if(i < 10)
+                    return "0" + i
+                return "" + i
+            }
+
+            let today = new Date()
+            let todayString = today.getFullYear() + '-' + pad(today.getMonth()+1) + '-' + pad(today.getDate())
+
+            for(let i=1; i<=9; i++) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+        <h1><a href="https://3mya4jha58.execute-api.eu-west-1.amazonaws.com/live/${i}/${todayString}">
+            https://3mya4jha58.execute-api.eu-west-1.amazonaws.com/live/${i}/${todayString}
+        </a></h1>
+                `;
+
+                document.getElementById('rawjson').appendChild(div);
+            }
+        </script>
     </body>
 </html>
