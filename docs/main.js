@@ -164,6 +164,9 @@ function movingAvg(array){
 
 async function drawGraph() {
   if(!getUrl().searchParams.get('s')) return
+
+  document.getElementById('todaysdate').innerHTML = date();
+
   let rooms = []
   for (let roomName of roomNames()) {
     const data = await get(roomName.id, date())

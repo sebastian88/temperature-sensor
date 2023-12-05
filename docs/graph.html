@@ -8,13 +8,17 @@
             button {
               width: 30%;
               height: 50px;
+              margin: 2% 1%;
             }
-            </style>
+        </style>
     </head>
     <body>
-        <button title="<<" id="back" onclick="back()"><<</button>
-        <button title="today" id="today" onclick="today()"">today</button>
-        <button title=">>" id="forward" onclick="forward()">>></button>
+        <div style="text-align: center;">
+            <button title="<<" id="back" onclick="back()"><<</button>
+            <button title="today" id="today" onclick="today()"">today</button>
+            <button title=">>" id="forward" onclick="forward()">>></button>
+        </div>
+        <h1 id="todaysdate" style="text-align: center;"></h1>
         <canvas id="myChart" style="width:100%"></canvas>
         
         <script src="main.js"></script>
