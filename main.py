@@ -75,8 +75,14 @@ def readTemperature(sensor):
 
 
 while True:
+    exception = ''
     try:
         sensor, led = setup()
+
+        if exception:
+            error={'message': exception}
+            requests.post('https://eonii83wfz2ze2u.m.pipedream.net', error, headers={'Content-Type': 'application/json'})
+            exception = ''
         
         flash(led, wifi_secrets.room)
         time.sleep(1.0)
@@ -90,6 +96,6 @@ while True:
             time.sleep(300)
 
     except Exception as e:
-        print(e)
+        exception = e.message
 
     time.sleep(60)
