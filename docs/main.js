@@ -106,11 +106,6 @@ function roomNames() {
         'name': nameAndAdjustment[0],
         'adjustment': adjustment
       })
-      console.log({
-        'id': id,
-        'name': nameAndAdjustment[0],
-        'adjustment': adjustment
-      })
     }
   }
   return rooms
