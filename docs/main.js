@@ -191,6 +191,15 @@ async function drawGraph() {
     rooms.push(new Room(roomName.id, roomName.name, date(), data, getColour(roomName.id), roomName.adjustment))
   }
 
+  
+  let errors = []
+  for (let room of rooms) {
+    if(!room.data || room.data.length == 0)
+      errors.push(`<span style="color: ${room.colour};">${room.name}</span>`)
+  }
+  if(errors.length > 0)
+    document.getElementById('errors').innerHTML = "No data for: " + errors.join(', ')
+
   let datasets = []
   let isShowTemp = showTemp()
   let isShowHumidity = showHumidity()
