@@ -161,9 +161,10 @@ function movingAvg(array){
 
   var result = [], val;
 
-  for (var i=0, len=array.length - rollingAverage; i <= len; i++){
-
-      val = avg(array.slice(i, i + rollingAverage));
+  for (var i=0; i <= array.length - 1; i++) {
+      const min = Math.max(0, i - rollingAverage)
+      const max = Math.min(i + rollingAverage, array.length - 1)
+      val = avg(array.slice(min, max));
       if (isNaN(val))
           console.log('nan')
       else{
