@@ -54,12 +54,13 @@ function move(i) {
 }
 
 class Room {
-  constructor(id, name, date, data, colour) {
+  constructor(id, name, date, data, colour, adjustment) {
     this.id = id
     this.name = name
     this.date = date
     this.data = data
     this.colour = colour
+    this.adjustment = adjustment
     this.temperatures = []
     this.humidities = []
     this.response = null
@@ -96,9 +97,19 @@ function roomNames() {
   for (let i = 1; i <= 9; i++) {
     if (params.get(i)) {
       id = i
+      const nameAndAdjustment = params.get(i).split(",")
+      let adjustment = Number(0)
+      if(typeof nameAndAdjustment[1] !== 'undefined')
+        adjustment = Number(nameAndAdjustment[1])
       rooms.push({
         'id': id,
-        'name': params.get(i)
+        'name': nameAndAdjustment[0],
+        'adjustment': adjustment
+      })
+      console.log({
+        'id': id,
+        'name': nameAndAdjustment[0],
+        'adjustment': adjustment
       })
     }
   }
@@ -124,8 +135,15 @@ function showHumidity() {
   return params.get('s').includes('h')
 }
 
-function getColour() {
-  return colours.shift();
+function getColour(i) {
+  return colours[i-1];
+}
+
+function standardise(array, adjustment){
+  for(i = 0; i < array.length; i++) {
+    array[i].y = Number(array[i].y) + adjustment
+  }
+  return array
 }
 
 function movingAvg(array){
@@ -170,7 +188,7 @@ async function drawGraph() {
   let rooms = []
   for (let roomName of roomNames()) {
     const data = await get(roomName.id, date())
-    rooms.push(new Room(roomName.id, roomName.name, date(), data, getColour()))
+    rooms.push(new Room(roomName.id, roomName.name, date(), data, getColour(roomName.id), roomName.adjustment))
   }
 
   let datasets = []
@@ -184,7 +202,7 @@ async function drawGraph() {
         borderColor: room.colour,
         fill: false,
         // lineTension: 1,
-        data: movingAvg(room.getTemperatures),
+        data: movingAvg(standardise(room.getTemperatures, room.adjustment)),
         yAxisID: 'y1'
       })
     }
