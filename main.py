@@ -15,7 +15,7 @@ def connectToWifiAndUpdate():
         while not sta_if.isconnected():
             pass
     print('network config:', sta_if.ifconfig())
-    otaUpdater = OTAUpdater('https://github.com/sebastian88/temperature-sensor', headers={'Authorization': 'token {}'.format(secrets.token)}, main_dir='app', secrets_file="secrets.py")
+    otaUpdater = OTAUpdater('https://github.com/sebastian88/temperature-sensor', headers={'Authorization': 'token {}'.format(secrets.TOKEN)}, main_dir='app', secrets_file="secrets.py")
     hasUpdated = otaUpdater.install_update_if_available()
     if hasUpdated:
         machine.reset()
