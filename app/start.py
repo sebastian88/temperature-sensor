@@ -92,6 +92,8 @@ def run():
             flash(led, secrets.ROOM)
             time.sleep(1.0)
             flash(led, secrets.ROOM)
+            time.sleep(1.0)
+            flash(led, secrets.ROOM)
 
 
             while True:
