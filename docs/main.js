@@ -68,6 +68,8 @@ class Room {
 
   get getTemperatures() {
     for (let item of this.data) {
+      if(isNaN(item.c))
+        continue
       this.temperatures.push({ x: Date.parse(item.t), y: item.c })
     }
     return this.temperatures
@@ -75,6 +77,8 @@ class Room {
 
   get getHumidities() {
     for (let item of this.data) {
+      if(isNaN(item.h))
+        continue
       this.humidities.push({ x: Date.parse(item.t), y: item.h })
     }
     return this.humidities
