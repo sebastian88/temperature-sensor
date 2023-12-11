@@ -24,7 +24,8 @@ def connectToWifiAndUpdate():
         gc.collect()
 
 def startApp():
-    import app.start
+    from app import start
+    start.run()
 
 
 connectToWifiAndUpdate()
