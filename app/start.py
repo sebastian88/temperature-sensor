@@ -62,17 +62,22 @@ def readTemperature(sensor):
     temperature_got = False
     temperature = None
     humidity = None
-    while temperature_got is False:
+    x = 1
+    while temperature_got is False and x < 20:
         try:
+            x += 1
             temperature = sensor.temperature
             humidity = sensor.humidity
             temperature_got = True
         except Exception as e:
             print(e)
-    
-    sensor_readings={'room': secrets.ROOM,'time': current_time, 'temperature': temperature, 'humidity': humidity}
-    request = requests.post(secrets.URL,json=sensor_readings,headers={'Content-Type': 'application/json'})
-    request.close()
+
+    if temperature_got:
+        sensor_readings={'room': secrets.ROOM,'time': current_time, 'temperature': temperature, 'humidity': humidity}
+        request = requests.post(secrets.URL,json=sensor_readings,headers={'Content-Type': 'application/json'})
+        request.close()
+    else:
+        raise Exception("Could not read temperature or humidity yo.")
 
 
 def run():
@@ -80,12 +85,12 @@ def run():
     while True:
         exception = ''
         try:
-            sensor, led = setup()
-
             if exception:
                 error={'message': exception}
                 requests.post('https://eonii83wfz2ze2u.m.pipedream.net', error, headers={'Content-Type': 'application/json'})
                 exception = ''
+
+            sensor, led = setup()
             
             flash(led, secrets.ROOM)
             time.sleep(1.0)
