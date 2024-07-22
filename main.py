@@ -1,7 +1,8 @@
-
+from machine import reset
+import time
 
 def connectToWifiAndUpdate():
-    import time, machine, network, gc, app.secrets as secrets
+    import machine, network, gc, app.secrets as secrets
     time.sleep(1)
     print('Memory free', gc.mem_free())
 
@@ -28,5 +29,14 @@ def startApp():
     start.run()
 
 
-connectToWifiAndUpdate()
-startApp()
+while True:
+    error_count = 0
+    try:
+        connectToWifiAndUpdate()
+        startApp()
+
+    except Exception:
+        error_count += 1
+        if error_count >= 20:
+            reset()
+        time.sleep(300)
