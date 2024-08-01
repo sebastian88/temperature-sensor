@@ -233,12 +233,20 @@ async function drawGraph() {
     yAxes.push({
       id: 'y1',
       position: 'left',
+      ticks: {
+        suggestedMin: 15,
+        suggestedMax: 25
+      }
     })
   }
   if(isShowHumidity) {
     yAxes.push({
       id: 'y2',
-      position: 'right'
+      position: 'right',
+      ticks: {
+        suggestedMin: 0,
+        suggestedMax: 100
+      }
     })
   }
 
@@ -252,6 +260,10 @@ async function drawGraph() {
       scales: {
         xAxes: [{
           type: 'time',
+          ticks: {
+            suggestedMin: Date.parse("2024-08-01T00:00:50Z"), // not working
+            suggestedMax: Date.parse("2024-08-01T23:00:50Z")
+          }
         }],
         yAxes: yAxes
       }
